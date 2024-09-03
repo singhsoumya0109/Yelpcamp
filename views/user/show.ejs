@@ -1,0 +1,263 @@
+<% layout('layouts/boilerplate') %>
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Make all cards the same height */
+    }
+    .card img {
+        width: 100%;
+        border-radius: 4px 4px 0 0;
+    }
+    .card h5 {
+        margin-top: 15px;
+        font-size: 1.25em;
+    }
+    .card h6 {
+        font-size: 1em;
+        color: #888;
+    }
+    .card p {
+        margin-top: 10px;
+        font-size: 0.95em;
+        color: #555;
+        flex-grow: 1; /* Ensure the description takes up available space */
+    }
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .col-md-4 {
+        flex: 1 1 calc(33.333% - 20px);
+        max-width: calc(33.333% - 20px);
+    }
+
+
+
+    .image {
+        width: auto;
+        height: auto;
+    }
+
+    .slider-container {
+        position: relative;
+        width: 100%;
+        max-width: 300px; /* Adjust the width as needed */
+        margin-bottom: 20px;
+    }
+
+    .form-range {
+        width: 100%;
+    }
+
+    .rating-value {
+        position: absolute;
+        top: -1px; /* Adjust the top value as needed */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #007bff;
+        color: white;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .addReview {
+        border: 2px solid black; /* Add black border */
+        padding: 10px; /* Optional: Add some padding */
+        margin-top: 20px; /* Optional: Add some margin to separate from other content */
+    }
+
+    .showReview {
+        border: 2px solid black; /* Add black border */
+        padding: 10px; /* Optional: Add some padding */
+        margin-top: 20px; /* Optional: Add some margin to separate from other content */
+        max-height: 500px; /* Set the max height for the scrollable area */
+        overflow-y: auto; /* Enable vertical scroll */
+    }
+
+    .review-list {
+        list-style-type: none; /* Remove bullet points */
+        padding: 0; /* Remove default padding */
+    }
+
+    .review-item {
+        background-color: #f9f9f9; /* Light grey background */
+        margin-bottom: 10px; /* Space between reviews */
+        padding: 10px; /* Space inside each review item */
+        border-radius: 4px; /* Rounded corners */
+        border: 1px solid #ddd; /* Light border */
+    }
+
+    .review-item:nth-child(odd) {
+        background-color: #e9e9e9; /* Slightly different background for alternating items */
+    }
+
+    .review-rating {
+        font-weight: bold;
+        color: #333;
+    }
+    .review-name {
+        font-weight: bold;
+        color: #000000;
+    }
+
+    .review-body {
+        margin-top: 2px;
+        font-size: 20px;
+        color: #0c0c0cf7;
+    }
+
+
+    .review-author {
+        margin-top: 2px;
+        font-size: 13px;
+        color: #0c0c0cf7;
+    }
+    .button {
+        display: inline-block;
+        padding: 5px 15px;
+        margin: 10px 0;
+        font-size: 16px;
+        text-align: center;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+
+    .button:active {
+        background-color: #004080;
+    }
+
+    .rating-counts {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+
+    .rating-counts p {
+        margin: 0 10px;
+    }
+
+
+
+    .rating-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .rating-card {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 200px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .rating-card p {
+        margin: 0px;
+        padding: 0px 0;
+    }
+    
+    .rating-value1 {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+</style>
+
+    
+    
+<h1>Hello <%= user.username %></h1>
+<h3>No of campgrounds you own=<%= user.campgrounds.length %></h3>
+
+
+<div class="row">
+    <% 
+        // Calculate the average rating for each camp
+        user.campgrounds.forEach(camp => {
+            let sum = 0;
+            camp.reviews.forEach(review => {
+                sum += review.rating;
+            });
+            camp.averageRating = camp.reviews.length ? sum / camp.reviews.length : 0;
+        });
+
+        // Sort camps by average rating in descending order and then by number of reviews in descending order
+        user.campgrounds.sort((a, b) => {
+           if (b.averageRating === a.averageRating) {
+                return b.reviews.length - a.reviews.length;
+            }
+            return b.averageRating - a.averageRating;
+        }); 
+        //camps.sort((a, b) => {
+            //if (b.reviews.length=== a.reviews.length) {
+               // return b.averageRating-a.averageRating;
+            //}
+           // return b.reviews.length - a.reviews.length;
+        //}); 
+    %>
+    <% for(let it of user.campgrounds) { %>
+        <div class="col-md-4">
+            <div class="card">
+                <a href="/campgrounds/<%= it._id %>">
+                    <img src="<%= it.image %>" alt="<%= it.title %>">
+                </a>
+                <h5><a href="/campgrounds/<%= it._id %>"><%= it.title %></a></h5>
+                <h6><%= it.location %></h6>
+                <p><%= it.description %></p>
+                
+                <% if(it.reviews.length) { %>
+                    <a href="/campgrounds/<%= it._id %>">
+                        <h6>Average Rating (<%= it.reviews.length %> ratings)</h6>
+                    </a>
+                    <h6><%= it.averageRating.toFixed(2) %> / 5</h6> <!-- Display the average with 2 decimal places -->
+                <% } else { %>
+                    <h6>Average Rating</h6>
+                    <h6>No reviews yet</h6>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+
+<h3>No of reviews done=<%= user.reviews.length %></h3>
+
+<% user.review=user.reviews.reverse();%> 
+<%if(user.reviews.length) { %>
+<div class="showReview">
+        <ul class="review-list">
+            <% user.reviews.forEach(review => { %>
+                <li class="review-item">
+                    <h5><a href="/campgrounds/<%= review.camp._id %>"><%= review.camp.title %></a></h5>
+                    <span class="review-rating">Rating: <%= review.rating %>/5</span>
+                    <p class="review-body"><%= review.body %></p>
+                    <form action="/campgrounds/<%= review.camp._id%>/<%=review._id%>/reviews?_method=DELETE" method="POST">
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+   
+</div>
+<% } %>
